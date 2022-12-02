@@ -14,6 +14,8 @@ class SettingApi extends Controller
 
     //MENGAMBIL DATA KUPON DAN TANGGAL DAN WAKTU
     public function index($time){
+
+        //FORMAT DATE ASIA JKARTA TIMEZONE
         date_default_timezone_set('Asia/Jakarta');
 
         $now = date('Y-m-d');
@@ -27,27 +29,32 @@ class SettingApi extends Controller
         $y = date_format($yesterday,'Y-m-d');
 
 
+        //MENAGMBIL KODE UNTUK HARI INI SIANG
         $voucher_siang      = Voucher::where('status','done')
                                 ->where('waktu','siang')
                                 ->whereDate('tanggal',$now)
                                 ->first();
 
+        //MENAGMBIL KODE UNTUK HARI INI MALAM
         $voucher_malam      = Voucher::where('status','done')
                                 ->where('waktu','malam')
                                 ->whereDate('tanggal',$now)
                                 ->first();
 
+        //MENAGMBIL KODE MALAM HARI KEMRIN AGAR KODE PAS MALAM MUNCUL DI HARI BERIKUTNYA
         $voucher_yesterday  = Voucher::where('status','done')
                                 ->where('waktu','malam')
                                 ->whereDate('tanggal',$y)
                                 ->first();
 
+        //JIKA KODE SIANG KOSONG MAKA DI ISI NULL
         if($voucher_siang){
             $kode_siang_yesterday = $voucher_siang->kode;
         }else{
             $kode_siang_yesterday = NULL;
         }
 
+        //INI MENGAMBIL KODE SIANG HARI INI, DAN KODE MALAM KEMRIN JIKA GANTI HARI
         if($voucher_malam){
             $kode_malam_yesterday = $voucher_malam->kode;
         }else{
@@ -58,7 +65,7 @@ class SettingApi extends Controller
             }
         }
 
-        #UNTUK DI TAMPILKAN 
+        #UNTUK DI TAMPILKAN DI COUNTER JAM DATA KODE HARI INI
 
         $show_siang         = Setting::where('status','active')
                                 ->where('waktu','siang')
