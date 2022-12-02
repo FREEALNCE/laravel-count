@@ -170,7 +170,7 @@
 
         <script>
             async function get(){
-                let response = await fetch('{{url('')}}/api/all');
+                let response = await fetch('{{url('')}}/api/all/'+time_now());
 
                 let data = await response.json()
 

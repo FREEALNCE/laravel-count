@@ -63,7 +63,6 @@
                     <thead>
                         <tr>
                           <th scope="col">waktu</th>
-                          <th scope="col">tanggal</th>
                           <th scope="col">time</th>
                           <th scope="col">kode</th>
                           <th scope="col">status</th>
@@ -74,7 +73,6 @@
                         @foreach($setting as $key)
                         <tr>
                           <td>{{$key->waktu}}</td>
-                          <td>{{$key->tanggal}}</td>
                           <td>{{$key->time}}</td>
                           <td>{{$key->kode}}</td>
                           <td>{{$key->status}}</td>

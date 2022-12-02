@@ -6,45 +6,70 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Setting;
+use App\Models\Voucher;
+use Carbon\Carbon;
 
 class SettingApi extends Controller
 {
 
+    //MENGAMBIL DATA KUPON DAN TANGGAL DAN WAKTU
     public function index($time){
         date_default_timezone_set('Asia/Jakarta');
 
-        $now            = date('Y-m-d');
-        $fetch_siang    = Setting::where('status','active')
-                            ->where('waktu','siang')
-                            ->first();
+        $now        = Carbon::now();
+        $yesterday  = Carbon::yesterday();
+        $tomorrow   = Carbon::tomorrow();
 
-        $fetch_malam    = Setting::where('status','active')
-                            ->where('waktu','malam')
-                            ->first();
+        $now                = date('Y-m-d');
+        $voucher_siang      = Voucher::where('status','done')
+                                ->where('waktu','siang')
+                                ->whereDate('tanggal',$yesterday)
+                                ->first();
 
-        if($fetch_siang){
+        $voucher_malam      = Voucher::where('status','done')
+                                ->where('waktu','malam')
+                                ->whereDate('tanggal',$yesterday)
+                                ->first();
+
+        #UNTUK DI TAMPILKAN 
+
+        $show_siang         = Setting::where('status','active')
+                                ->where('waktu','siang')
+                                ->whereTime('time','<=',$time)
+                                ->first();
+
+        $show_malam         = Setting::where('status','active')
+                                ->where('waktu','malam')
+                                ->whereTime('time','<=',$time)
+                                ->first();
+
+        if($show_siang){
             return response()->json([
-                "status_api"    =>"success",
-                "code"      =>"200",
-                "message"   =>"success get data",
-                "id"        =>$fetch_siang->id,
-                "waktu"     =>$fetch_siang->waktu,
-                "time"      =>$fetch_siang->time,
-                "tanggal"   =>$now,
-                "kode"      =>$fetch_siang->kode,
-                "status"    =>$fetch_siang->status,
+                "status_api"            => "success",
+                "code"                  => 200,
+                "message"               => "success get data",
+                "id"                    => $show_siang->id,
+                "waktu"                 => $show_siang->waktu,
+                "time"                  => $show_siang->time,
+                "tanggal"               => $now,
+                "kode"                  => $show_siang->kode,
+                "status"                => $show_siang->status,
+                "kode_yesterday_siang"  => $voucher_siang->kode,
+                "kode_yesterday_malam"  => $voucher_malam->kode,
             ], 200);
-        }elseif($fetch_malam){
+        }elseif($show_malam){
             return response()->json([
-                "status_api"    =>"success",
-                "code"      =>"200",
-                "message"   =>"success get data",
-                "id"        =>$fetch_malam->id,
-                "waktu"     =>$fetch_malam->waktu,
-                "time"      =>$fetch_malam->time,
-                "tanggal"   =>$now,
-                "kode"      =>$fetch_malam->kode,
-                "status"    =>$fetch_malam->status,
+                "status_api"            => "success",
+                "code"                  => "200",
+                "message"               => "success get data",
+                "id"                    => $show_malam->id,
+                "waktu"                 => $show_malam->waktu,
+                "time"                  => $show_malam->time,
+                "tanggal"               => $now,
+                "kode"                  => $show_malam->kode,
+                "status"                => $show_malam->status,
+                "kode_yesterday_siang"  => $voucher_siang->kode,
+                "kode_yesterday_malam"  => $voucher_malam->kode,
             ], 200);
         }else{
             return response()->json([
@@ -55,38 +80,25 @@ class SettingApi extends Controller
         }
     }
 
-    public function fetch_one($date,$time,$waktu){
+
+    //MEMBUAT HISTORY KUPON
+    public function history_create($id){
+
         date_default_timezone_set('Asia/Jakarta');
-        $now            = date('Y-m-d');
+        $now        = Carbon::now();
+        $yesterday  = Carbon::yesterday();
+        $tomorrow   = Carbon::tomorrow();
 
-        $fetch = Setting::where('status','active')
-                ->whereTime('time', '<=', $time)
-                ->where('status','active')
-                ->where('waktu',$waktu)
-                ->first();
-        if($fetch){
-            return response()->json([
-                "status_api"    =>"success",
-                "code"      =>"200",
-                "message"   =>"success get data",
-                "id"        =>$fetch->id,
-                "waktu"     =>$fetch->waktu,
-                "time"      =>$fetch->time,
-                "tanggal"   =>$now,
-                "kode"      =>$fetch->kode,
-                "status"    =>$fetch->status,
-            ], 200);
-        }else{
-            return response()->json([
-                "status_api"    =>"failed",
-                "code"      =>"400",
-                "message"   =>"failed get data",
-            ], 400);
-        }
-    }
 
-    public function update($id){
-        $update = Setting::where('id',$id)->update(["status"=>'done']);
+        $fetch = Setting::where('id',$id)->first();
+
+        $save = Voucher::create([
+            "waktu"     => $fetch->waktu,
+            "tanggal"   => $now,
+            "kode"      => $fetch->kode,
+            "time"      => $fetch->time,
+            "status"    => "done",
+        ]);
 
         return $update;
     }

@@ -12,7 +12,6 @@ class Setting extends Model
 
     protected $fillable = [
         'waktu',
-        'tanggal',
         'kode',
         'time',
         'status',
@@ -34,7 +33,6 @@ class Setting extends Model
 
         $update = Setting::where('id',$request->id)->update([
                 "waktu"=>$request->waktu,
-
                 "kode"=>$request->kode,
                 "time"=>$request->time,
                 "status"=>$request->status,
