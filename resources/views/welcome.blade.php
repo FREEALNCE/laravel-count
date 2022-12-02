@@ -82,7 +82,17 @@
 
         <script>
 
-            function result($str1,$str2,$str3,$str4,$str5){
+        function reset_write(){
+            const instance = new TypeIt("#kode", {
+            strings: "",
+            }).go();
+
+            instance.reset();
+            document.getElementById("kode").innerHTML = "";
+            
+        }
+
+        async function result($str1,$str2,$str3,$str4,$str5){
                 const instance = new TypeIt("#kode");
                 instance.type($str1)
                         .pause(3000)
@@ -95,12 +105,7 @@
                         .type($str5)
                         .pause(3000)
                         .go();
-            }
 
-            function standar(){
-                const instance = new TypeIt("#kode");
-                instance.type('_ _ _ _ _')
-                        .go();
             }
 
             function time_now(){
@@ -175,19 +180,26 @@
                     waktuUndian(data.tanggal, data.time)
 
                     // convert kode undian to string
-                    let str = kode;
+                    let str = data.kode;
 
                     let waktu_sekarang = time_now()
 
                     if (waktu_sekarang >= data.time){
-                        result(str[0],str[1],str[2],str[3],str[4])
-                    }
-                    else{
-                        standar()
+                        
+                        reset_write()
+                        // tampilan kode
+                        await result(str[0],str[1],str[2],str[3],str[4])
+
+                        let update = await fetch('{{url('')}}/api/update/'+data.id);
+
+                        console.log(update.json())
+
+                        // refresh lagi 
+                        get()
                     }
                 
                 }else{
-                    console.log("error get data api")
+                    console.log("data active not found")
                 }
             }
 

@@ -22,12 +22,24 @@ class Setting extends Model
 
         $save = Setting::create([
             "waktu"=>$request->waktu,
-            "tanggal"=>$request->tanggal,
             "kode"=>$request->kode,
             "time"=>$request->time,
             "status"=>$request->status,
         ]);
 
         return $save;
+    }
+
+    public static function updateData($request){
+
+        $update = Setting::where('id',$request->id)->update([
+                "waktu"=>$request->waktu,
+
+                "kode"=>$request->kode,
+                "time"=>$request->time,
+                "status"=>$request->status,
+        ]);
+
+        return $update;
     }
 }

@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('all', [SettingApi::class, 'index']);
+Route::get('update/{id}', [SettingApi::class, 'update']);

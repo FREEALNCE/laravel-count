@@ -7,8 +7,10 @@ use App\Http\Controllers\SettingController;
 Route::get('/', [SettingController::class, 'index']);
 Route::get('setting', [SettingController::class, 'setting']);
 Route::post('setting/store', [SettingController::class, 'store']);
+Route::post('setting/update', [SettingController::class, 'update']);
 Route::get('setting/destroy/{id}', [SettingController::class, 'destroy']);
 
+Route::get('setting/edit/{id}', [SettingController::class, 'edit']);
 /*
 |--------------------------------------------------------------------------
 | Web Routes

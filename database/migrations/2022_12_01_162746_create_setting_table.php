@@ -16,10 +16,9 @@ return new class extends Migration
         Schema::create('setting', function (Blueprint $table) {
             $table->id();
             $table->string('waktu');
-            $table->date('tanggal');
+            $table->string('status');
             $table->string('kode');
             $table->time('time');
-            $table->string('status');
             $table->timestamps();
         });
     }

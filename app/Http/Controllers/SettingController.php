@@ -18,10 +18,15 @@ class SettingController extends Controller
         return view('setting',$data);
     }
 
+    public function edit($id){
+        $data['row'] = Setting::find($id);
+
+        return view('edit',$data);
+    }
+
     public function store(Request $request){
         $request->validate([
             'waktu'      => 'required|string',
-            'tanggal'    => 'required|date',
             'time'       => 'required',
             'kode'       => 'required|string',
             'status'     => 'required|string',
@@ -34,6 +39,25 @@ class SettingController extends Controller
             return redirect()->back()->with('message','success save data')->with('message_type','primary');
         }else{
             return redirect()->back()->with('message','failed save data')->with('message_type','warning');
+        }
+    }
+
+    public function update(Request $request){
+        $request->validate([
+            'id'         => 'required',
+            'waktu'      => 'required|string',
+            'time'       => 'required',
+            'kode'       => 'required|string',
+            'status'     => 'required|string',
+
+        ]);
+
+        $update = Setting::updateData($request);
+
+        if($update){
+            return redirect()->back()->with('message','success update data')->with('message_type','primary');
+        }else{
+            return redirect()->back()->with('message','failed update data')->with('message_type','warning');
         }
     }
 
