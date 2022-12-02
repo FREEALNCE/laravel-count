@@ -71,36 +71,29 @@
                     integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
         </script>
 
-        <script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/typeit/5.10.1/typeit.min.js"></script>
 
         <script>
 
-        function reset_write(){
-            const instance = new TypeIt("#kode", {
-            strings: "",
-            }).go();
+        
+// https://www.typeitjs.com/docs/vanilla#installation
+//PAKAI YANG VERSI 5.10,1
+// DIGUNAKAN UNTUK MENULIS HURUF SATU PERSATU
+        function result(kode){
 
-            instance.reset();
-            document.getElementById("kode").innerHTML = "";
-            
-        }
-
-        async function result($str1,$str2,$str3,$str4,$str5){
-                const instance = new TypeIt("#kode");
-                instance.type($str1)
-                        .pause(3000)
-                        .type($str2)
-                        .pause(3000)
-                        .type($str3)
-                        .pause(3000)
-                        .type($str4)
-                        .pause(3000)
-                        .type($str5)
-                        .pause(3000)
-                        .go();
-
+            var instance =   new TypeIt('#kode', {
+                strings: kode,
+                speed: 3000,
+                autoStart: true,
+                afterComplete: function(instance){
+                    instance.destroy();
+                    // FUNGSI CALLBACK UNTUK MELAKUKAN RESET
+                    getApi()
+                }
+                });
             }
-
+    
+            //FUNGSI MENGAMBIL DATA SEKARANG
             function time_now(){
                 var today = new Date();
                 var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -112,8 +105,61 @@
         
         <script>
 
-            function countDown(date, time){
+            //MELAKUKAN ASSIGN VALUE SAAT PERTAMA WEB DI RELEOD
+            function assignValue(data){
+                if (data.status_api == "success") {
+                
+                
+                    if(data.waktu == 'siang'){
 
+                        //ambil hasil result pas malam
+                        let malam = data.kode_past_malam;
+
+                        if(malam != null){
+                            document.getElementById("kode").innerHTML = malam;
+                        }else{
+
+                            document.getElementById("kode").innerHTML = '_ _ _ _ _';
+                        }
+
+                    }else{
+                        //ambil hasil result pas malam
+                        let siang = data.kode_past_siang;
+
+                        if(siang != null){
+                            document.getElementById("kode").innerHTML = siang;
+                        }else{
+
+                            document.getElementById("kode").innerHTML = '_ _ _ _ _';
+                        }
+                    
+                    }
+                }else{
+                    console.log("data active not found")
+                }
+            }
+
+            // FUNGSI MENAMPILKAN DATA DARI RESULT DI ATAS
+            async function delayResult(data){
+                kode = data.kode;
+                result(kode)
+
+            }
+
+            //FUNGSI MEMBUAT HISTORY KUPON PER HARI
+            async function createHistory(data)
+            {
+            
+                let url = window.location.href+'api/history/create/'+data.id;
+                let response = await fetch(url);
+                
+                await delayResult(data);
+            }
+
+            //FUNGSI COUNTDOWN
+            function countDown(data){
+                date = data.tanggal
+                time = data.time
                 dateFormatted = date.toLocaleString('default',{day: 'numeric', month: 'long', year: 'numeric'});
                 // Mengatur waktu akhir perhitungan mundur
                 var countDownDate = new Date(date+' '+time).getTime();
@@ -139,77 +185,54 @@
 
                 document.getElementById("demo").innerHTML ="count down = &nbsp;:&nbsp;" + hours + "&nbsp;:&nbsp;"
                 + minutes + "&nbsp;:&nbsp;" + seconds;
-                    
+                
                 // Jika hitungan mundur selesai, tulis beberapa teks 
                 if (distance < 0) {
                     clearInterval(x);
-                    document.getElementById("demo").innerHTML = "DONE";
 
-                    // refresh api get dan update
-                    getApi()
+                    document.getElementById("demo").innerHTML = "Result "+data.waktu;
+
+                    document.getElementById("kode").innerHTML = "";
+
+                    createHistory(data);
                 }
                 }, 1000);
             }
 
         </script>
 
+        {{-- //MENAMPILKAN WAKTU UNDIAN --}}
         <script>
-            function waktuUndian(date,time){
-                document.getElementById("undian").innerHTML ="waktu undian = &nbsp;&nbsp;" + date + "&nbsp;,&nbsp;"
-                + time;
+            function waktuUndian(data){
+                document.getElementById("undian").innerHTML ="waktu undian = &nbsp;&nbsp;" + data.tanggal + "&nbsp;,&nbsp;"
+                + data.time;
             }
         </script>
 
+        {{-- FUNGSI MELAKUKAN GET API DARI WEBSITE --}}
         <script>
             async function getApi(){
-                let response = await fetch('{{url('')}}/api/all/'+time_now());
+                let url = window.location.href+'api/all/'+time_now();
+
+                let response = await fetch(url);
 
                 let data = await response.json()
 
                 if (data.status_api == "success") {
                     
-                    countDown(data.tanggal, data.time)
-                    waktuUndian(data.tanggal, data.time)
+                    //countdown data
+                    countDown(data)
 
-                    if(data.waktu == "siang"){
-                        if(data.kode_past_malam){
-                            document.getElementById("kode").innerHTML = data.kode_past_malam;
-                        }else{
-                            document.getElementById("kode").innerHTML = "_ _ _ _ _";
-                        }
-                    }else{
-                        if(data.kode_past_siang){
-                            document.getElementById("kode").innerHTML = data.kode_past_siang;
-                        }else{
-                            document.getElementById("kode").innerHTML = "_ _ _ _ _";
-                        }
-                    }
-
-                    // convert kode undian to string
-                    let str = data.kode;
-
-                    let waktu_sekarang = time_now()
-
-                    if (waktu_sekarang >= data.time){
-                        
-                        reset_write()
-                        // tampilan kode
-                        await result(str[0],str[1],str[2],str[3],str[4])
-
-                        let update = await fetch('{{url('')}}/api/history/create/'+data.id);
-
-                        console.log(update.json())
-
-                    }
-                
-                }else{
-                    console.log("data active not found")
+                    //waktu undian
+                    waktuUndian(data)
+                    
+                    //memberikan value awal
+                    assignValue(data)
                 }
-            }
+            }   
 
             getApi()
 
-            // setInterval(get, 1000)
         </script>
 
     </body>

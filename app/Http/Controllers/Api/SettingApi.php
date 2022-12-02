@@ -16,11 +16,17 @@ class SettingApi extends Controller
     public function index($time){
         date_default_timezone_set('Asia/Jakarta');
 
-        $now        = Carbon::now();
-        $yesterday  = Carbon::yesterday();
-        $tomorrow   = Carbon::tomorrow();
+        $now = date('Y-m-d');
+  
+        $tommorow = Carbon::tomorrow(); 
 
-        $now                = date('Y-m-d');
+        $t = date_format($tommorow,'Y-m-d');
+
+        $yesterday = Carbon::yesterday();
+
+        $y = date_format($yesterday,'Y-m-d');
+
+
         $voucher_siang      = Voucher::where('status','done')
                                 ->where('waktu','siang')
                                 ->whereDate('tanggal',$now)
@@ -28,7 +34,12 @@ class SettingApi extends Controller
 
         $voucher_malam      = Voucher::where('status','done')
                                 ->where('waktu','malam')
-                                ->whereDate('tanggal',$yesterday)
+                                ->whereDate('tanggal',$now)
+                                ->first();
+
+        $voucher_yesterday  = Voucher::where('status','done')
+                                ->where('waktu','malam')
+                                ->whereDate('tanggal',$y)
                                 ->first();
 
         if($voucher_siang){
@@ -40,7 +51,11 @@ class SettingApi extends Controller
         if($voucher_malam){
             $kode_malam_yesterday = $voucher_malam->kode;
         }else{
-            $kode_malam_yesterday = NULL;
+            if($voucher_yesterday){
+                $kode_malam_yesterday = $voucher_yesterday->kode;
+            }else{
+                $kode_malam_yesterday = NULL;
+            }
         }
 
         #UNTUK DI TAMPILKAN 
@@ -66,8 +81,8 @@ class SettingApi extends Controller
                 "tanggal"               => $now,
                 "kode"                  => $show_siang->kode,
                 "status"                => $show_siang->status,
-                "kode_past_siang"  => $kode_siang_yesterday,
-                "kode_past_malam"  => $kode_malam_yesterday
+                "kode_past_siang"       => $kode_siang_yesterday,
+                "kode_past_malam"       => $kode_malam_yesterday
             ], 200);
         }elseif($show_malam){
             return response()->json([
@@ -80,15 +95,30 @@ class SettingApi extends Controller
                 "tanggal"               => $now,
                 "kode"                  => $show_malam->kode,
                 "status"                => $show_malam->status,
-                "kode_past_siang"  => $kode_siang_yesterday,
-                "kode_past_malam"  => $kode_malam_yesterday
+                "kode_past_siang"       => $kode_siang_yesterday,
+                "kode_past_malam"       => $kode_malam_yesterday
             ], 200);
         }else{
+
+            $besok_siang = Setting::where('status','active')
+                            ->where('waktu','siang')
+                            ->whereTime('time','<=',$time)
+                            ->first();
+
             return response()->json([
-                "status_api"    =>"failed",
-                "code"      =>"400",
-                "message"   =>"data not found",
-            ]);
+                "status_api"            => "success",
+                "code"                  => 200,
+                "message"               => "success get data",
+                "id"                    => $besok_siang->id,
+                "waktu"                 => $besok_siang->waktu,
+                "time"                  => $besok_siang->time,
+                "tanggal"               => $t,
+                "kode"                  => $besok_siang->kode,
+                "status"                => $besok_siang->status,
+                "kode_past_siang"       => $kode_siang_yesterday,
+                "kode_past_malam"       => $kode_malam_yesterday
+            ], 200);
+
         }
     }
 
@@ -97,9 +127,16 @@ class SettingApi extends Controller
     public function history_create($id){
 
         date_default_timezone_set('Asia/Jakarta');
-        $now        = Carbon::now();
-        $yesterday  = Carbon::yesterday();
-        $tomorrow   = Carbon::tomorrow();
+
+        $now = date('Y-m-d');
+  
+        $tommorow = Carbon::tomorrow(); 
+
+        $t = date_format($tommorow,'Y-m-d');
+
+        $yesterday = Carbon::yesterday();
+
+        $y = date_format($yesterday,'Y-m-d');
 
 
         $fetch = Setting::where('id',$id)->first();
@@ -112,6 +149,6 @@ class SettingApi extends Controller
             "status"    => "done",
         ]);
 
-        return $update;
+        return $save;
     }
 }

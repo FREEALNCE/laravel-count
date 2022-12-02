@@ -14,7 +14,7 @@ class SettingController extends Controller
     }
 
     public function setting(){
-        $data['setting'] = Setting::all();
+        $data['setting'] = Setting::orderBy('time','asc')->get();
         $data['voucher'] = Voucher::all();
 
         return view('setting',$data);
