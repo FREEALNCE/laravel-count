@@ -57,7 +57,7 @@
             </div>
 
             <div class="col-sm-12" style="margin-top:20px">
-
+              <h3>Setting Kupon</h3>
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
@@ -77,8 +77,8 @@
                           <td>{{$key->kode}}</td>
                           <td>{{$key->status}}</td>
                           <td>
-                            <a href="{{url('setting/edit/'.$key->id)}}" class="btn btn-sm btn-warning">edit</a>
-                            <a href="{{url('setting/destroy/'.$key->id)}}" class="btn btn-sm btn-danger">delete</a>
+                            <a href="{{url('setting/edit/'.$key->id)}}" class="btn btn-sm btn-success">edit</a>
+                            <a href="{{url('setting/destroy/'.$key->id)}}" class="btn btn-sm btn-primary">delete</a>
                           </td>
                         </tr>
                         @endforeach
@@ -86,6 +86,39 @@
                 </table>
               </div>
             </div>
+
+
+            <div class="col-sm-12" style="margin-top:20px">
+              <h3>history kupon / voucher</h3>
+              <div class="table-responsive">
+                  <table class="table table-bordered">
+                      <thead>
+                          <tr>
+                            <th scope="col">waktu</th>
+                            <th scope="col">time</th>
+                            <th scope="col">tanggal</th>
+                            <th scope="col">kode</th>
+                            <th scope="col">status</th>
+                            <th scope="col">action</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                          @foreach($voucher as $key)
+                          <tr>
+                            <td>{{$key->waktu}}</td>
+                            <td>{{$key->tanggal}}</td>
+                            <td>{{$key->time}}</td>
+                            <td>{{$key->kode}}</td>
+                            <td>{{$key->status}}</td>
+                            <td>
+                              <a href="{{url('voucher/destroy/'.$key->id)}}" class="btn btn-sm btn-danger">delete</a>
+                            </td>
+                          </tr>
+                          @endforeach
+                        </tbody>
+                  </table>
+                </div>
+              </div>
 
         </div>
     </div>

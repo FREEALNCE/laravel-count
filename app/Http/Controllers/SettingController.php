@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Setting;
+use App\Models\Voucher;
 
 class SettingController extends Controller
 {
@@ -14,6 +15,7 @@ class SettingController extends Controller
 
     public function setting(){
         $data['setting'] = Setting::all();
+        $data['voucher'] = Voucher::all();
 
         return view('setting',$data);
     }

@@ -35,17 +35,12 @@
                         <input type="number" minlength="1" maxlength="5" value="{{$row->kode}}" class="form-control form-control-sm" name="kode" id="kode" required>
                     </div>
 
-                    <div class="col-md-4">
-                      <label for="tanggal" class="form-label">Tanggal</label>
-                      <input type="date" class="form-control form-control-sm" value="{{$row->tanggal}}" name="tanggal" id="tanggal" required>
-                    </div>
-
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <label for="time" class="form-label">time</label>
                         <input type="time" class="form-control form-control-sm" name="time" value="{{$row->time}}" id="time" required>
                       </div>
 
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <label for="inputPassword4" class="form-label">Status</label>
                         <select class="form-select form-select-sm" name="status" aria-label=".form-select-sm example" required>
                           <option value="{{$row->status}}">{{$row->status}}</option>
