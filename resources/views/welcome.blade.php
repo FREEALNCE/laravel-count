@@ -34,10 +34,13 @@
                 </div>
 
                 <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                    <div class="grid grid-cols-1">
+                    <div class="grid grid-cols-1" style="padding: 10px">
 
 
                             <h2 class="text-center">Hallo World</h2>
+                            <div id="undian"></div>
+                            <div id="demo"></div>
+                            <div>prize : <span id="kode"></span> </div>
 
                         
                     </div>
@@ -71,6 +74,127 @@
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" 
+                    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
+        </script>
+
+        <script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
+
+        <script>
+
+            function result($str1,$str2,$str3,$str4,$str5){
+                const instance = new TypeIt("#kode");
+                instance.type($str1)
+                        .pause(3000)
+                        .type($str2)
+                        .pause(3000)
+                        .type($str3)
+                        .pause(3000)
+                        .type($str4)
+                        .pause(3000)
+                        .type($str5)
+                        .pause(3000)
+                        .go();
+            }
+
+            function standar(){
+                const instance = new TypeIt("#kode");
+                instance.type('_ _ _ _ _')
+                        .go();
+            }
+
+            function time_now(){
+                var today = new Date();
+                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                console.log(time);
+
+                return time;
+            }
+
+        </script>
+        
+        <script>
+
+            function countDown(date, time){
+
+                dateFormatted = date.toLocaleString('default',{day: 'numeric', month: 'long', year: 'numeric'});
+                // Mengatur waktu akhir perhitungan mundur
+                var countDownDate = new Date(date+' '+time).getTime();
+                
+                // Memperbarui hitungan mundur setiap 1 detik
+                var x = setInterval(function() {
+                
+                // Untuk mendapatkan tanggal dan waktu hari ini
+                var now = new Date().getTime();
+                    
+                // Temukan jarak antara sekarang dan tanggal hitung mundur
+                var distance = countDownDate - now;
+                    
+                // Perhitungan waktu untuk hari, jam, menit dan detik
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                // Keluarkan hasil dalam elemen dengan id = "demo"
+                // document.getElementById("demo").innerHTML = days + "&nbsp;:&nbsp;" + hours + "&nbsp;:&nbsp;"
+                // + minutes + "&nbsp;:&nbsp;" + seconds;
+
+                document.getElementById("demo").innerHTML ="count down = &nbsp;:&nbsp;" + hours + "&nbsp;:&nbsp;"
+                + minutes + "&nbsp;:&nbsp;" + seconds;
+                    
+                // Jika hitungan mundur selesai, tulis beberapa teks 
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("demo").innerHTML = "DONE";
+
+                    // refresh api get dan update
+                    get()
+                }
+                }, 1000);
+            }
+
+        </script>
+
+        <script>
+            function waktuUndian(date,time){
+                document.getElementById("undian").innerHTML ="waktu undian = &nbsp;&nbsp;" + date + "&nbsp;,&nbsp;"
+                + time;
+            }
+        </script>
+
+        <script>
+            async function get(){
+                let response = await fetch('{{url('')}}/api/all');
+
+                let data = await response.json()
+
+                if (data.status_api == "success") {
+                    
+                    countDown(data.tanggal, data.time)
+                    waktuUndian(data.tanggal, data.time)
+
+                    // convert kode undian to string
+                    let str = kode;
+
+                    let waktu_sekarang = time_now()
+
+                    if (waktu_sekarang >= data.time){
+                        result(str[0],str[1],str[2],str[3],str[4])
+                    }
+                    else{
+                        standar()
+                    }
+                
+                }else{
+                    console.log("error get data api")
+                }
+            }
+
+            get()
+
+            // setInterval(get, 1000)
+        </script>
+
     </body>
 </html>
