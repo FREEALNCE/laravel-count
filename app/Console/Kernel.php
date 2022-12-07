@@ -28,49 +28,53 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
 
-                $time = date('H:i:s');
+            $time = date('H:i');
 
-                $now = date('Y-m-d');
+            $now = date('Y-m-d');
 
-                $show_siang = Setting::where('status','active')
-                        ->where('waktu','siang')
-                        ->whereTime('time','>=',$time)
-                        ->first();
+            $show_siang = Setting::where('status','active')
+                    ->where('waktu','siang')
+                    ->whereTime('time','<=',$time)
+                    ->first();
 
-                $show_malam = Setting::where('status','active')
-                        ->where('waktu','malam')
-                        ->whereTime('time','>=',$time)
-                        ->first();
+            $show_malam = Setting::where('status','active')
+                    ->where('waktu','malam')
+                    ->whereTime('time','<=',$time)
+                    ->first();
 
-                if($show_siang){
+            if($show_siang){
 
-                    $history_siang    = Voucher::where('status','done')
-                                        ->whereDate('created_at',$now)
-                                        ->where('waktu','siang')
-                                        ->first();
+                $history_siang    = Voucher::where('status','done')
+                                    ->whereDate('tanggal',$now)
+                                    ->where('waktu','siang')
+                                    ->orderBy('created_at','desc')
+                                    ->first();
 
-                    if($history_siang == null){
-                        Voucher::history_create($show_siang->id);
-                    }
-                    elseif($history_siang->kode != $show_siang->kode){
-                        Voucher::history_create($show_siang->id);
-                    }
-
-                }elseif($show_malam){
-                    $history_malam    = Voucher::where('status','done')
-                                        ->whereDate('created_at',$now)
-                                        ->where('waktu','malam')
-                                        ->first();
-
-                    if($history_malam == null){
-                        Voucher::history_create($show_siang->id);
-                    }
-                    elseif($history_malam->kode != $show_malam->kode){
-                        Voucher::history_create($show_malam->id);
-                    }
+                if($history_siang == null){
+                    Voucher::history_create($show_siang->id);
+                }
+                elseif($history_siang->kode != $show_siang->kode){
+                    Voucher::history_create($show_siang->id);
                 }
 
-        })->everyTwoMinutes();
+            }
+            
+            if($show_malam){
+                $history_malam    = Voucher::where('status','done')
+                                    ->whereDate('tanggal',$now)
+                                    ->where('waktu','malam')
+                                    ->orderBy('created_at','desc')
+                                    ->first();
+
+                if($history_malam == null){
+                    Voucher::history_create($show_siang->id);
+                }
+                elseif($history_malam->kode != $show_malam->kode){
+                    Voucher::history_create($show_malam->id);
+                }
+            }
+
+        })->everyFiveMinutes();
     }
 
     /**

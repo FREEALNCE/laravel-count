@@ -185,4 +185,55 @@ class SettingApi extends Controller
 
         return $save;
     }
+
+    public function test(){
+                $time = date('H:i');
+
+                $now = date('Y-m-d');
+
+                $show_siang = Setting::where('status','active')
+                        ->where('waktu','siang')
+                        ->whereTime('time','<=',$time)
+                        ->first();
+
+                $show_malam = Setting::where('status','active')
+                        ->where('waktu','malam')
+                        ->whereTime('time','<=',$time)
+                        ->first();
+
+                if($show_siang){
+
+                    $history_siang    = Voucher::where('status','done')
+                                        ->whereDate('tanggal',$now)
+                                        ->where('waktu','siang')
+                                        ->orderBy('created_at','desc')
+                                        ->first();
+
+                    if($history_siang == null){
+                        Voucher::history_create($show_siang->id);
+                    }
+                    elseif($history_siang->kode != $show_siang->kode){
+                        Voucher::history_create($show_siang->id);
+                    }
+
+                }
+                
+                if($show_malam){
+                    $history_malam    = Voucher::where('status','done')
+                                        ->whereDate('tanggal',$now)
+                                        ->where('waktu','malam')
+                                        ->orderBy('created_at','desc')
+                                        ->first();
+
+                    if($history_malam == null){
+                        Voucher::history_create($show_siang->id);
+                    }
+                    elseif($history_malam->kode != $show_malam->kode){
+                        Voucher::history_create($show_malam->id);
+                    }
+                }
+
+        return "ceo";
+
+    }
 }

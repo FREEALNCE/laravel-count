@@ -21,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('all/{time}', [SettingApi::class, 'index']);
 Route::get('history/create/{id}', [SettingApi::class, 'history_create']);
+
+Route::get('test', [SettingApi::class, 'test']);
