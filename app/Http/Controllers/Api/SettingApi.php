@@ -113,7 +113,8 @@ class SettingApi extends Controller
 
             $history       = Voucher::where('status','done')
                                 ->whereDate('created_at',$now)
-                                ->orderBy('created_at','desc')
+                                ->orderBy('tanggal','desc')
+                                ->orderBy('time','desc')
                                 ->first();
 
             $besok_siang = Setting::where('status','active')
