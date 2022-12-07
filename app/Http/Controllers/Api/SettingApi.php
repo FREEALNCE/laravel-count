@@ -186,6 +186,8 @@ class SettingApi extends Controller
         return $save;
     }
 
+
+    //TEST FUNGSI DI CRONJOB
     public function test(){
                 $time = date('H:i');
 
@@ -233,7 +235,7 @@ class SettingApi extends Controller
                     }
                 }
 
-        return "ceo";
+        return "TEST";
 
     }
 }

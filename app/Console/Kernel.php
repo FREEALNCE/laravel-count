@@ -21,27 +21,31 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
-        //CRONJOB DIGUNAKAN UNTUK MENGUPDATE WAKTU JIKA FILE JS TIDAK DI EKSEKUSI
-        //KEKURANGAN FILE JS HANYA DI EKSEKUSI KETIKA PAGE TERSEBUT DIBUKA, JIKA TIDAK DIBUKA MAKA KODE OTOMATIS DI JALANKAN OLEH CRONJOB
+        //CRONJOB DIGUNAKAN UNTUK MENGUPDATE HISTORY KOSE SESUAI WAKTU JIKA FILE JS TIDAK DI EKSEKUSI
+        //KEKURANGAN FILE JS HANYA DI EKSEKUSI KETIKA PAGE TERSEBUT DIBUKA, JIKA TIDAK DIBUKA MAKA KODE OTOMATIS DI JALANKAN OLEH CRONJOB DAN DI UPDATE DI HISTORY KUPON
         date_default_timezone_set('Asia/Jakarta');
 
 
         $schedule->call(function () {
 
+            //DEKLARASI WAKTU DAN TANGGAL
             $time = date('H:i');
 
             $now = date('Y-m-d');
 
+            //CHECK WAKTU SIANG DAN KODE 
             $show_siang = Setting::where('status','active')
                     ->where('waktu','siang')
                     ->whereTime('time','<=',$time)
                     ->first();
 
+            //CHECK WAKTU MALAM DAN KODE 
             $show_malam = Setting::where('status','active')
                     ->where('waktu','malam')
                     ->whereTime('time','<=',$time)
                     ->first();
 
+            // AKAN MENAMBAHKAN JIKA KODE TIDAK TEREKSEKUSI
             if($show_siang){
 
                 $history_siang    = Voucher::where('status','done')
@@ -50,6 +54,7 @@ class Kernel extends ConsoleKernel
                                     ->orderBy('created_at','desc')
                                     ->first();
 
+                //AKAN MENAMBAHKAN HISTORY JIKA HISTORY HARI INI TIDAK ADA DAN SUDAH ADA TAPI KODE BERBEDA
                 if($history_siang == null){
                     Voucher::history_create($show_siang->id);
                 }
@@ -66,6 +71,7 @@ class Kernel extends ConsoleKernel
                                     ->orderBy('created_at','desc')
                                     ->first();
 
+                //AKAN MENAMBAHKAN HISTORY JIKA HISTORY HARI INI TIDAK ADA DAN SUDAH ADA TAPI KODE BERBEDA
                 if($history_malam == null){
                     Voucher::history_create($show_siang->id);
                 }
