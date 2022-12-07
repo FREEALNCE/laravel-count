@@ -63,6 +63,7 @@ class SettingController extends Controller
         }
     }
 
+
     public function destroy($id){
         $delete = Setting::where('id',$id)->delete();
 

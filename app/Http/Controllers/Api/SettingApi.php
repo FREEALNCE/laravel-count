@@ -47,6 +47,10 @@ class SettingApi extends Controller
                                 ->whereDate('tanggal',$y)
                                 ->first();
 
+        $voucher_last  = Voucher::where('status','done')
+                                ->orderBy('created_at','desc')
+                                ->first();
+
         //JIKA KODE SIANG KOSONG MAKA DI ISI NULL
         if($voucher_siang){
             $kode_siang_yesterday = $voucher_siang->kode;
@@ -60,8 +64,8 @@ class SettingApi extends Controller
         }else{
             if($voucher_yesterday){
                 $kode_malam_yesterday = $voucher_yesterday->kode;
-            }else{
-                $kode_malam_yesterday = NULL;
+            }elseif($voucher_last){
+                $kode_malam_yesterday = $voucher_last->kode;
             }
         }
 
@@ -107,25 +111,48 @@ class SettingApi extends Controller
             ], 200);
         }else{
 
+            $history       = Voucher::where('status','done')
+                                ->whereDate('created_at',$now)
+                                ->orderBy('created_at','desc')
+                                ->first();
+
             $besok_siang = Setting::where('status','active')
-                            ->where('waktu','siang')
-                            ->whereTime('time','<=',$time)
-                            ->first();
+                                ->where('waktu','siang')
+                                ->whereTime('time','<=',$time)
+                                ->first();
+            if($history){
 
-            return response()->json([
-                "status_api"            => "success",
-                "code"                  => 200,
-                "message"               => "success get data",
-                "id"                    => $besok_siang->id,
-                "waktu"                 => $besok_siang->waktu,
-                "time"                  => $besok_siang->time,
-                "tanggal"               => $t,
-                "kode"                  => $besok_siang->kode,
-                "status"                => $besok_siang->status,
-                "kode_past_siang"       => $kode_siang_yesterday,
-                "kode_past_malam"       => $kode_malam_yesterday
-            ], 200);
+                return response()->json([
+                    "status_api"            => "success",
+                    "code"                  => 200,
+                    "message"               => "success get data",
+                    "id"                    => $besok_siang->id,
+                    "waktu"                 => $besok_siang->waktu,
+                    "time"                  => $besok_siang->time,
+                    "tanggal"               => $t,
+                    "kode"                  => $besok_siang->kode,
+                    "status"                => $besok_siang->status,
+                    "kode_past_siang"       => $history->kode,
+                    "kode_past_malam"       => $history->kode,
+                ], 200);
 
+            }else{
+
+                return response()->json([
+                    "status_api"            => "success",
+                    "code"                  => 200,
+                    "message"               => "success get data",
+                    "id"                    => $besok_siang->id,
+                    "waktu"                 => $besok_siang->waktu,
+                    "time"                  => $besok_siang->time,
+                    "tanggal"               => $t,
+                    "kode"                  => $besok_siang->kode,
+                    "status"                => $besok_siang->status,
+                    "kode_past_siang"       => $kode_siang_yesterday,
+                    "kode_past_malam"       => $kode_malam_yesterday
+                ], 200);
+
+            }
         }
     }
 
