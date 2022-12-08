@@ -66,6 +66,8 @@ class SettingApi extends Controller
                 $kode_malam_yesterday = $voucher_yesterday->kode;
             }elseif($voucher_last){
                 $kode_malam_yesterday = $voucher_last->kode;
+            }else{
+                $kode_malam_yesterday = NULL;
             }
         }
 
